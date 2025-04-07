@@ -5,6 +5,7 @@
 % --------------------------
 scriptsToRun = {    % Specify script filenames in execution order
     'sort_data.m'
+    'cross_ana.m'
     'SVAR_main.m'
     
 };
