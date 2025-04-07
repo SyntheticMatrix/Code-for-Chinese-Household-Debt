@@ -1,0 +1,130 @@
+. drop if total_asset<=0
+(0 observations deleted)
+
+. drop if total_income<=0
+(752 observations deleted)
+
+. sum total_debt
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+  total_debt |     26,512    72887.26    316849.1          0   1.40e+07
+
+. gen DAR = total_debt/ total_asset
+
+. gen DIR = total_debt/total_income
+
+
+. sum DIR if poorest20_income
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DIR |      4,702    423.4863    14698.95          0   898751.7
+
+. sum DAR if poorest20_asset
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DAR |      5,269    3.401043    139.2307          0      10000
+
+
+
+. sum DAR if poorest20_income
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DAR |      4,702    1.101634    20.87965          0   857.6642
+
+ sum DAR if richest80_income
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DAR |     21,810    .6710387    67.75497          0      10000
+
+. sum DAR if richest80_asset
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DAR |     21,243    .0892125    .3152326          0   21.57791
+
+. sum DIR if richest80_asset
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DIR |     21,243    92.79226    6915.259          0   898751.7
+
+. sum DIR if richest80_income
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DIR |     21,810    .9269476    4.118652          0   275.1032
+
+. sum DIR if poorest20_asset
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DIR |      5,269    7.641505    321.5001          0      22934
+
+. xtile pctile_asset8 = total_asset, nq(1000)
+
+
+. gen poorest08_asset = (pctile_asset8>1 & pctile_asset8<201)
+
+. sum DAR if poorest08_asset
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DAR |      5,276    1.077571    13.51754          0   857.6642
+
+
+. sum DIR if poorest08_asset
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DIR |      5,276    7.632578    321.2869          0      22934
+
+. xtile pctile_income8 = total_income, nq(1000)
+
+. gen poorest08_income = (pctile_income8>1 & pctile_income8<201)
+
+. sum DAR if poorest08_income
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DAR |      5,276    1.027617    19.80512          0   857.6642
+
+. sum DIR if poorest08_income
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DIR |      5,276    51.12968    1149.819          0   67567.57
+
+. gen richest08_income = (pctile_income8>=201 & pctile_income8<1000)
+
+. sum DAR if richest08_income
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DAR |     21,183    .6790107    68.74377          0      10000
+
+. sum DIR if richest08_income
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DIR |     21,183    .9160201     4.11867          0   275.1032
+
+. gen richest08_asset = (pctile_asset8>=201 & pctile_income8<1000)
+
+. sum DAR if richest08_asset
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DAR |     21,183    .0888959    .3140079          0   21.57791
+
+. sum DIR if richest08_asset
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         DIR |     21,183    93.05227    6925.044          0   898751.7
+
+. exit, clear
