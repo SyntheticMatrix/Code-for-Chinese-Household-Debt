@@ -208,61 +208,56 @@ for i = 1:length(remaining_indices)
 end
 
 % 
-w1_liq_next(w1_liq_next < 0) = 0;
-w1_ill_next(w1_ill_next < 0.1) = 0.1;
-five_indices = find(w2_liq_next <1);
+p = 0.05; 
+q = 0.2;  
+mu = 0.072;  five_indices = find(w2_liq_next <1); w1_liq_next(w1_liq_next < 0) = 0; w1_ill_next(w1_ill_next < 0.1) = 0.1;
+
 
 for i = 1:length(five_indices)
     index = five_indices(i);
     
     while w2_liq_next(index) < 1
-        if w2_ill_next(index) > 0  % 确保非流动资产大于0
-            % 进行转移
+        if w2_ill_next(index) > 0 
+            % transfer
             w2_liq_next(index) = w2_liq_next(index) + transfer_amount;
             w2_ill_next(index) = w2_ill_next(index) - 0.2*transfer_amount;
         else
-            % 如果非流动资产为0，直接转移所有可能的资产
+            
             w2_liq_next(index) = w2_liq_next(index) + w2_ill_next(index)-0.1;
-            w2_ill_next(index) = 0.1;  % 将非流动资产清零
-            % 更新转移次数
+            w2_ill_next(index) = 0.1;  
+            % update
             transfer_count2(index) = transfer_count2(index) + 1;
             T2(index) = T2(index) + transfer_amount;
-            break;  % 结束循环
+            break;  
         end
         
-        % 检查转移后是否已经满足条件
+        % check
         if w2_liq_next(index) >= 1
-            break;  % 满足条件，退出循环
+            break;  
         end
     end
 end
 
-% 标记剩余家庭（未触发阈值调整的家庭）
 remaining_indices2 = setdiff(1:length(w2_liq_next), negative_indices);
 
-% 定义转移支付概率参数（示例值，可根据需要调整）
-p = 0.05;  % 变卖概率
-q = 0.2;  % 购买概率
-mu = 0.072;  % 转移支付量均值
 
-% 为剩余家庭创建转移支付量（指数分布示例）
 transfer_amounts2 = exprnd(mu, 1, length(remaining_indices2));
 
-% 处理剩余家庭的转移支付
+
 for i = 1:length(remaining_indices2)
     index = remaining_indices2(i);
     rand_val = rand();
     current_transfer2 = transfer_amounts2(i);
     
     if rand_val < p
-        % 变卖不可流动资产
-        illiquid_available = w2_ill_next(index) - 0.1;  % 保持最低非流动资产
+        % sale
+        illiquid_available = w2_ill_next(index) - 0.1;  
         if illiquid_available > current_transfer2
-            % 正常转移
+            
             w2_liq_next(index) = w2_liq_next(index) + current_transfer2;
             w2_ill_next(index) = w2_ill_next(index) - 0.2*current_transfer2;
         else
-            % 转移全部可用非流动资产
+           
             w2_liq_next(index) = w2_liq_next(index) + illiquid_available;
             w2_ill_next(index) = 0.1;
             current_transfer2 = illiquid_available;
@@ -271,7 +266,7 @@ for i = 1:length(remaining_indices2)
         T2(index) = T2(index) + current_transfer2;
         
     elseif rand_val < p + q
-        % 购买不可流动资产
+        % purchase
         if w2_liq_next(index) > current_transfer2
             w2_liq_next(index) = w2_liq_next(index) - current_transfer2;
             w2_ill_next(index) = w2_ill_next(index) + 0.2*current_transfer2;
@@ -280,18 +275,11 @@ for i = 1:length(remaining_indices2)
         end
     end
     
-    % 记录转移类型（可选）
-    % transfer_type(index) = 根据操作类型标记（例如1-变卖，2-购买，0-无操作）
 end
  
 
-    % 计算调整成本
 adjustment_cost = chi_0 + chi_1 * abs(T ./ max(w1_liq_next, w1_liq_lower_bound));
 adjustment_cost2 = chi_0 + chi_1 * abs(T2./ max(w2_liq_next, w2_liq_lower_bound));
-% 更新后的流动资产（扣除调整成本）
-%w1_liq_next = w1_liq_next + 0.9 * w1_ill ;
-% 计算更新后的非流动资产
-
     w1_liq_next = real(w1_liq_next - adjustment_cost);
     w1_liq_next = min(20, max(-1, w1_liq_next));
     
@@ -299,28 +287,18 @@ adjustment_cost2 = chi_0 + chi_1 * abs(T2./ max(w2_liq_next, w2_liq_lower_bound)
     w2_liq_next = min(20, max(-1, w2_liq_next));
 
         w1_ill_next = max(0, min(20, w1_ill_next));
-        %w2_ill_next = max(0, min(20, w2_ill_next));
-        % 消费路径更新（欧拉方程逼近 + 插值修正）
-       % C1_next = min(1, max(0.01, 0.98 * ((evaluate_chebyshev(C1_interp_coeff, C1) + mpc_dynamic .* w1_liq_next))));
-        C1_growth_factor = (1 + mpc_dynamic);  % 考虑到下一期的边际消费倾向和流动资产
+      
+        C1_growth_factor = (1 + mpc_dynamic);  
 C1_cheby = evaluate_chebyshev_1(C1_interp_coeff, C1);
 C2_growth_factor = (1 + mpc_dynamic2);
 C2_cheby = evaluate_chebyshev_1(C2_interp_coeff, C2);
-% 利用欧拉方程修正消费路径，平滑消费变化
+
 C1_next =  C1_cheby .* (C1_growth_factor / (1 + rho * delta_t)) .^ (1/gamma1) ; 
 C2_next = C2_cheby.* (C2_growth_factor/(1 + rho * delta_t)).^(1/gamma1) ;
 
-% 使用合理的上下限
-%C1_next = min(1, max(0.01, C1_next));
-%C2_next = min(2, max(0.01+abs(randn * 0.1), C2_next));
-       % D = (C1_next - w1_liq_next) + 0.5 * sin(2 * pi * t / 100) + 0.001 * abs(randn);
-        %D = 0.0425 *D + 0.5*(C1_next - w1_liq_next);
-       % D_f = fft(D);  % 傅立叶变换处理
-       % D = real(D_f);
-       % D = max(-0.1, min(D, params.D_max));  % 限制借贷
-       % D = 0.75 * D;
-       % D = 0.2815 * sin(w1_liq_next + w1_ill_next) + sin(C1_next) - 0.09283;
-       D = odebtfunc(w1_liq_next, w1_ill_next, C1_next);
+
+ %D = 0.0425 *D + 0.5*(C1_next - w1_liq_next);
+        D = odebtfunc(w1_liq_next, w1_ill_next, C1_next);
      %D = max(0, min(D, params.D_max));
       %  D2 = 0.0425*D2 + 0.5* (C2_next - w2_liq_next);
         D2 = odebtfunc(w2_liq_next, w2_ill_next, C2_next);
@@ -333,10 +311,6 @@ C2_next = C2_cheby.* (C2_growth_factor/(1 + rho * delta_t)).^(1/gamma1) ;
         y2_next = employment_status2 .* (params.alpha + params.beta * y2 * 1.02) + ~employment_status2 * 0.01;
         
        
-        % 将更新后的值写回
-       
-        
-    
         V_liq =w1_liq_next;
         V_ill = w1_ill_next;
         V_ill = real(V_ill);
@@ -347,60 +321,52 @@ C2_next = C2_cheby.* (C2_growth_factor/(1 + rho * delta_t)).^(1/gamma1) ;
         V_liq2 = real(V_liq2);
         V_ill2 = real(V_ill2);
        
-         % 资产更新：基于Young插值进行优化
         
        V1_interp =  interpolate_V1(V1_grid, grid_points_liq, grid_points_ill, V_liq, V_ill, w1_liq, w1_ill);  % 插值计算V1
        V2_interp = interpolate_V1(V2_grid, grid_points_liq2, grid_points_ill2, V_liq2, V_ill2, w2_liq, w2_ill);
      for iter = 1:params.max_iter
-        fprintf('Time step: %d, Iteration: %d\n', t, iter); % 输出迭代进度
+        fprintf('Time step: %d, Iteration: %d\n', t, iter); 
        V1_interp = log(C1+1) + 0.98 * V1_interp;
         V1_interp(isnan(V1_interp)) = 0.1;
         
-        disp('V1_interp:');
-        disp(num2str(V1_interp'));  % 逐行显示 V1_interp
+        %disp('V1_interp:');
+       % disp(num2str(V1_interp'));  
         
         V2_interp = log(C2+1) +0.98 * V2_interp;
         V2_interp(isnan(V2_interp)) = 0.1;
         
-        disp('V2_interp:');
-        disp(num2str(V2_interp'));
+        %disp('V2_interp:');
+        %disp(num2str(V2_interp'));
         
-       
-        %disp(evaluate_chebyshev(C1_interp_coeff, C1));  % 打印 Chebyshev 插值结果
-        %disp(mpc_dynamic);  % 打印边际消费倾向
-        diff = max(abs(V1_interp - V1));
+        difff = max(abs(V1_interp - V1));
         disp('diff:');
-        disp(num2str(diff));
+        disp(num2str(difff));
         diff2 = max(abs(V2_interp - V2));
         disp('diff2:');
         disp(num2str(diff2));
-        if diff < tol && diff2 <tol
+        if difff < tol && diff2 <tol
         %if converged
              fprintf('Converged at time step: %d, iteration: %d\n', t, iter);
             break;
         end
         %V1 = V1_interp;
-        V1 = (1 - lambda) * V1 + lambda * V1_interp;  % lambda 从 0.5 开始逐步减小
+        V1 = (1 - lambda) * V1 + lambda * V1_interp;  
         V2 = (1 - lambda) * V2 + lambda * V2_interp;
      end
-        %时间步外循环 求解转移矩阵变化 更新变量
+
         V11_plus = interpolate_V1(V1_grid, grid_points_liq, grid_points_ill, V_liq, V_ill, w1_liq , w1_ill + delta_w1);
 
-        % 插值计算在 w1 - delta_w1 处的 V1 值
         V11_minus = interpolate_V1(V1_grid, grid_points_liq, grid_points_ill, V_liq, V_ill, w1_liq, w1_ill - delta_w1);
-        % 插值计算在 w1 + delta_w1 处的 V1 值
+   
         V1_plus = interpolate_V1(V1_grid, grid_points_liq, grid_points_ill, V_liq, V_ill, w1_liq + delta_w1, w1_ill);
-
-        % 插值计算在 w1 - delta_w1 处的 V1 值
         V1_minus = interpolate_V1(V1_grid, grid_points_liq, grid_points_ill, V_liq, V_ill, w1_liq - delta_w1, w1_ill);
         V22_plus = interpolate_V1(V1_grid, grid_points_liq2, grid_points_ill2, V_liq2, V_ill2, w2_liq , w2_ill + delta_w1);
 
-        % 插值计算在 w1 - delta_w1 处的 V1 值
         V22_minus = interpolate_V1(V1_grid, grid_points_liq2, grid_points_ill2, V_liq2, V_ill2, w2_liq, w2_ill - delta_w1);
-        % 插值计算在 w1 + delta_w1 处的 V1 值
+    
         V2_plus = interpolate_V1(V1_grid, grid_points_liq2, grid_points_ill2, V_liq2, V_ill2, w2_liq + delta_w1, w2_ill);
 
-        % 插值计算在 w1 - delta_w1 处的 V1 值
+        
         V2_minus = interpolate_V1(V1_grid, grid_points_liq2, grid_points_ill2, V_liq2, V_ill2, w2_liq - delta_w1, w2_ill);
          g_rate1 = calculate_evolution_rate1(V1, w1_liq, w1_ill, y1, t, w1_liq_next, w1_ill_next, y1_next, V1_plus, V1_minus, V11_plus, V11_minus);
         g_rate2 = calculate_evolution_rate2(V2, w2_liq, w2_ill, y2, t, w2_liq_next, w2_ill_next, y2_next, V2_plus, V2_minus, V22_plus, V22_minus);
@@ -418,7 +384,7 @@ C2_next = C2_cheby.* (C2_growth_factor/(1 + rho * delta_t)).^(1/gamma1) ;
         C2 = C2_next;
         current_status1 = employment_status1;
         current_status2 = employment_status2;
-         %存储最新的 V1
+   
     V_history_matrix(:, current_index) = V1;
     W1_liq_matrix(:, current_index) = w1_liq_next;
     W1_ill_matrix(:, current_index) = w1_ill_next;
@@ -447,8 +413,8 @@ for i = 1:400
 end
     [a_t, b_t] = solve_time_varying_params(n, theta, d_bar, d_min);
     ww1 = a_t + b_t * (w1_liq_next+w1_ill_next);
-    %sorted_wealth_t = sort(ww1(:, t)); % 按照财富排序
-    %cumulative_wealth_t = cumsum(sorted_wealth_t) / sum(sorted_wealth_t);  % 计算财富累积分布
+    %sorted_wealth_t = sort(ww1(:, t));
+    %cumulative_wealth_t = cumsum(sorted_wealth_t) / sum(sorted_wealth_t);  
         d_bar2 = max(w2_liq_next + w2_ill_next)/50;
     d_min2 = min(w2_liq_next + w2_ill_next)/50;
      min_value2 = min(w2_ill);
@@ -460,10 +426,10 @@ for i = 1:400
 end
     [c_t, d_t] = solve_time_varying_params(n, theta, d_bar2, d_min2);
     ww2 = c_t + d_t * (w2_liq_next+w2_ill_next);
-    % 更新当前索引（循环方式）
+  
     current_index = mod(current_index, window_size) + 1;
         
-        % 判断是否周期性
+     
        
         if t >= window_size
       [converged, periodic_indices] = convergence_check(V_history_matrix, V1_interp, V1, window_size, tol);
@@ -475,5 +441,36 @@ end
         if converged && converged2
             break
         end
-        
+      % Data preparation (example data)
+numTimeSteps = 100; % Total original time steps
+ill_test = randn(100, numTimeSteps); % Sample data: 100 nodes × 100 time steps
+liq_test = randn(100, numTimeSteps);
+ww = ill_test + liq_test;
+ww_diff = diff(ww, 1, 2); % Differenced data becomes 100×(numTimeSteps-1)
+
+% Initialize parameters
+p_history = []; % Array to store computed p-values
+stop_flag = false;
+
+% Main loop: Iterate through adjacent time step pairs in differenced data
+for t = 1 : (numTimeSteps - 1)
+    % Perform KS test (compare t and t+1 in differenced data)
+    [~, p] = kstest2(ww_diff(:, t), ww_diff(:, t + 1));
+    
+    % Record and display results
+    fprintf('p-value between step %d and %d = %.4f\n', t, t+1, p);
+    p_history(end+1) = p; % Append new p-value
+    
+    % Check historical records for consecutive thresholds
+    if check_consecutive_p(p_history, 0.1, 5)
+        fprintf('Detected 5 consecutive p>0.1 at steps %d-%d, terminating iteration\n', t, t+1);
+        stop_flag = true;
+        break;
+    end
 end
+
+if ~stop_flag
+    fprintf('Completed all %d step checks\n', numTimeSteps-1);
+end
+end
+
