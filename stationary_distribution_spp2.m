@@ -5,7 +5,7 @@ figure('Color','w','Position',[100 100 1200 450]);
 % =====================
 illiquidWealth2 = W2_ill_matrix_old(:,12);
 liquidWealth2 = W2_liq_matrix_old(:,12);
-new_asset.illquidt = W2_ill_matrix(:,12);
+new_asset.illiquidt = W2_ill_matrix(:,12);
 new_asset.liquid2 = W2_liq_matrix(:,12);
 binWidth = 0.1;
 binEdges = 0:binWidth:max([illiquidWealth2+liquidWealth2; new_asset.illiquidt+new_asset.liquid2]);
@@ -33,9 +33,10 @@ original_mean = mean(w2_liq_real+w2_ill_real);
 
 
 delta_illiquid = mean(illiquidWealth2+liquidWealth2) - mean(your_original_illiquid_data);
-xIlliquidShifted = xIlliquidOriginal + delta_illiquid;
+
 
 [fIlliquidOriginal, xIlliquidOriginal] = ksdensity(your_original_illiquid_data);
+xIlliquidShifted = xIlliquidOriginal + delta_illiquid;
 plot(xIlliquidShifted, fIlliquidOriginal * binWidth, 'k--', 'LineWidth', 1.5);
 
 
