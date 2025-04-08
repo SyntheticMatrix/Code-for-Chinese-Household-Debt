@@ -22,6 +22,9 @@
 % Read parameters & grids into memory
 
 par   = parameters;
+% par = parameters2;
+% par = parameters3;
+
 grids = makegrids(par);
 
 % Check the parameter values are valid
