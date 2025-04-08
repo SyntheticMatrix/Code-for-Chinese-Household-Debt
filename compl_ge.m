@@ -108,10 +108,6 @@ sgtitle('Impulse Response Functions');
 
 
 %% 
-
-IR=ir(f_indirect,p,x2_1,100);
-
-%% 
 f_indirect = f;
 f_indirect(:,5) = 0;
 IR=ir(f_indirect,p,x2_1,100);
