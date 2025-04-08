@@ -1,25 +1,22 @@
-% 变量顺序：
-% 状态变量：b, a, k, d, e （共5个）
-% 跳跃变量：c, pi, y, m, ra, w, rb, l, I, u, rk （共11个，但根据方程调整）
-% 总方程数 = 5（状态） + 9（跳跃） = 14
-state_vars = {'b', 'a', 'k', 'e', 'd'};      % 5个状态变量
-jump_vars = {'y', 'pi', 'rb', 'ra'}; % 9个跳跃变量（根据实际方程调整）
-n_states = length(state_vars);               % 5
-n_jumps = length(jump_vars);                 % 9
-total_vars = n_states + n_jumps;             % 14
+
+state_vars = {'b', 'a', 'k', 'e', 'd'};    
+jump_vars = {'y', 'pi', 'rb', 'ra'}; 
+n_states = length(state_vars);            
+n_jumps = length(jump_vars);                
+total_vars = n_states + n_jumps;            
 %% 
-A = zeros(total_vars, total_vars); % 14x14矩阵，左乘x(t+1)或E_t[j(t+1)]
-B = zeros(total_vars, total_vars); % 14x14矩阵，右乘x(t)或j(t)
+A = zeros(total_vars, total_vars); 
+B = zeros(total_vars, total_vars); 
 
 %% 
-% 行1: b(t+1) =(1+rb_ss)*b(t) - c(t) - d(t) + b_ss * rb(t)
+% 1: b(t+1) =(1+rb_ss)*b(t) - c(t) - d(t) + b_ss * rb(t)
 rb_ss = 0.01;
 b_ss = 0.0244;
 row = 1;
 q = 0.02;
 omega = 0.15;
-A(row, 1) = 1;       % b(t+1) 的系数
-B(row, 1) = (1 + rb_ss); % b(t) 的系数
+A(row, 1) = 1;       
+B(row, 1) = (1 + rb_ss); 
 B(row, 3) = q;
 B(row, 2) = omega;
 B(row, 6) = -1;   % y(t)
@@ -61,8 +58,6 @@ B(row, 5) = rho_e;   % e(t)
 %% \dot{y} -omega*\dot{a} = y - omega*a +rb -\dot{pi}
 
 row = 6;
-% 当前变量：c(t), rb(t), pi(t)
-% 未来预期：c(t+1), pi(t+1)
 B(row, 6) = 1;    % c(t)
 A(row, 6) = 1;   % -E_t[c(t+1)]
 B(row, 8) = 1;  % -rb(t)
@@ -85,7 +80,7 @@ row = 8;
 B(row, 8) = 1;   % rb(t)
 B(row, 7) = -phi_pi; % -phi_pi*pi(t)
 B(row, 6) = -phi_y; % -phi_y*y(t)
-B(row, 5) = -1;                        % -e(t)（e是状态变量，列5）
+B(row, 5) = -1;                        % -e(t)
 
 
 %% r^a + k = y
@@ -98,27 +93,20 @@ B(row, 6) = -0.8*0.25;
 
 
 %% 
-% 假设 IR 是一个 100x8 的矩阵，存储了脉冲响应函数
-% IR 的每一列代表一个变量的脉冲响应
-
-% 设置时期
 periods = 1:100;
-
-% 创建一个新的图形窗口
 figure;
 
-% 循环绘制每个变量的脉冲响应
+
 for i = 1:8
-    subplot(4, 2, i); % 4行2列的子图布局，第i个子图
-    plot(periods, IR(:, i)); % 绘制第i个变量的脉冲响应
-    title(['Variable ', num2str(i)]); % 设置子图标题
-    xlabel('Period'); % 设置x轴标签
-    ylabel('Response'); % 设置y轴标签
-    grid on; % 添加网格
+    subplot(4, 2, i); 
+    plot(periods, IR(:, i)); 
+    title(['Variable ', num2str(i)]); 
+    xlabel('Period'); 
+    ylabel('Response');
+    grid on; 
 end
 
-% 调整子图之间的间距
-sgtitle('Impulse Response Functions'); % 设置整个图表的标题
+sgtitle('Impulse Response Functions');
 
 
 %% 
@@ -129,11 +117,8 @@ x2_1(3) = mean((D_matrix(:,5)-D_matrix(:,4))./D_matrix(:,4));
 x2_1(4) = 0;
 x2_1(5) = 1;
 [f,p] = solab(A,B,5);
-%x2_0 = [0.088, 0.005, 0.054, 0.12, 1];
 IR=ir(f,p,x2_1,100);
-%% 
 
-IR=ir(f_indirect,p,x2_1,100);
 
 %% 
 f_indirect = f;
