@@ -16,7 +16,7 @@ And then run the 'cross_ana.m' to get the cross-correlation results with two fig
 Run the 'SVAR_IRF_def.m' to define the cholesky sequences and therefore the subtitles of each panel will be displayed.
 
 **IMPORTANCE ADD-ON**
-To get the rest robustness tests in Appendix, please mannually change the data series in the Alternative Cholesky Sequences, they denote the case 2, 3, and 4, respectively
+To get the rest robustness tests in Appendix, please mannually change the data series in the Alternative Cholesky Sequences, they denote the case 2, 3, and 4, respectively. Please also change the substitle from 'title_IRF_v1' to 'title_IRF_v2', 'title_IRF_v3', and 'title_IRF_v4' accordingly, in order to display the correct substitles of the Cholesky Sequences.
 
 To get the rest robustness tests in the response letter, please mannually change the data series in the robustness test alternative section.
 
