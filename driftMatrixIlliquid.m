@@ -1,7 +1,7 @@
 function KK = driftMatrixIlliquid(sa,aaa,par)
     
     % Unpack parameter values
-    I = par.I; J = par.J; Nz = par.Nz;
+    I = par.I; J = par.J; Nz = 8;
     diag = 1:(I*J*Nz); diagArray = reshape(diag,I,J,Nz);
     
     % preallocating

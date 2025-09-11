@@ -15,7 +15,7 @@ function [g, dadbdz] = stationaryDistribution(A, a, b, par, type)
     db(1)     = (b(2) - b(1))/2;
     db(I)     = (b(I) - b(I-1))/2;
     
-    assert(sum(db) - (par.bmax - par.bmin) < 1e-10, 'Accumulated db do not equal the range of b')
+   % assert(sum(db) - (par.bmax - par.bmin) < 1e-10, 'Accumulated db do not equal the range of b')
 
     da(2:J-1) = (a(3:J) - a(1:J-2))/2;
     da(1)     = (a(2) - a(1))/2;

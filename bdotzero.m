@@ -1,11 +1,11 @@
 function dpol = bdotzero(bdrift_zero,VaF,VaB,grids,par)
 
     % Unpack parameters & grids
-    b = grids.b; a = grids.a; z = par.z; I = par.I; J = par.J; Nz = par.Nz; 
+    b = grids.b; a = grids.a; z = par.state_params; I = par.I; J = par.J; Nz =8; 
     chi0 = par.chi0; chi1 = par.chi1; xi = par.xi; w = par.w;
 
     % Define important boundaries for the d policy
-    d_zerodrift = - driftilliquid(0,grids.aaa,grids.zzz,par);
+    d_zerodrift = - driftilliquid_1(0,grids.aaa,grids.zzz,par);
     d_lower     = grids.aaa.*(par.chi0-1)/par.chi1;          
 
     % Set up solution object
@@ -32,7 +32,7 @@ function dpol = bdotzero(bdrift_zero,VaF,VaB,grids,par)
 
                     % d cannot be too large because c would need to be
                     % negative to ensure zero liquid drift. Find the max
-                    dmax = max(roots([par.chi1/(2*a(aj)), par.chi0+1, -driftLiquid(0,0,b(bi),a(aj),z(zk),par)]))-1e-12;
+                    dmax = max(roots([par.chi1/(2*a(aj)), par.chi0+1, -driftLiquid_1(0,0,b(bi),a(aj),z(zk),par)]))-1e-12;
 
                     bounds = [0,dmax];
                     fun    = @(x) tester(x,VaF(bi,aj,zk),1);

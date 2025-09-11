@@ -1,7 +1,7 @@
 function BB = driftMatrixLiquid(sb, bbb, par)
     
     % Unpack parameter values
-    I = par.I; J = par.J; Nz = par.Nz;
+    I = par.I; J = par.J; Nz = 8;
     diag = 1:(I*J*Nz);
     
     % Preallocating memory
