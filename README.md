@@ -12,6 +12,14 @@ In case of running the empirical results separately, one could achieve by firstl
 **STEP1.2**
 And then run the 'cross_ana.m' to get the cross-correlation results with two figures
 
+**NEW STEP**
+Run the 'SVAR_IRF_def.m' to define the cholesky sequences and therefore the subtitles of each panel will be displayed.
+
+**IMPORTANCE ADD-ON**
+To get the rest robustness tests in Appendix, please mannually change the data series in the Alternative Cholesky Sequences, they denote the case 2, 3, and 4, respectively
+
+To get the rest robustness tests in the response letter, please mannually change the data series in the robustness test alternative section.
+
 **STEP1.3**
 Then run the 'SVAR_main.m' to get the SVAR results with various tests and figures
 
