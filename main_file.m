@@ -6,6 +6,7 @@
 scriptsToRun = {    % Specify script filenames in execution order
     'sort_data.m'
     'cross_ana.m'
+    'SVAR_IRF_def.m'
     'SVAR_main.m'
     
 };
@@ -62,3 +63,4 @@ for k = 1:numel(scriptsToRun)
 end
 
 fprintf('\n\n=== All scripts completed ===\n');
+
