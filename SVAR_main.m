@@ -421,7 +421,7 @@ title_IRF = (1:K^2); % replace with relevant string vector
 for i=1:K^2
     subplot(K,K,i);
     hold on
-    title(title_IRF(i),'Interpreter','latex')
+    title(title_IRF_v1(i),'Interpreter','latex')
     plot(0:h,IRF(:,i),'k-','Linewidth',2);
     plot(0:h,IRF_CIlo(:,i),'k:');
     plot(0:h,IRF_CIhi(:,i),'k:');
@@ -454,4 +454,5 @@ end
 
 % Efron method 
 %FEVD_CI_Efron = 100*quantile(FEVDbs_MPshock,[alpha/2,1-alpha/2],3);
+
 
