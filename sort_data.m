@@ -9,10 +9,19 @@ price = xlsread(filename, sheet, 'D158:D312');  %
 interest_rate = xlsread(filename, sheet, 'J158:J312'); % 
 assets = xlsread(filename, sheet, 'I158:I311'); % 
 housing = xlsread(filename, sheet, 'G158:G311');
-borrowing = xlsread(filename, sheet, 'B158:B311'); % 
+borrowing = xlsread(filename, sheet, 'N158:N311'); 
+
 output_a = diff(output_a);
 price = diff(price);
 interest_rate = diff(interest_rate);
+%% Robustness test alternatives
+%output_a = log(xlsread(filename, sheet, 'P158:P312')); %the alternative
+%for GDP
+%price = xlsread(filename, sheet, 'O158:O312');  % the alternative for CPI
+%borrowing = xlsread(filename, sheet, 'B158:B311'); % the alternative
+%for debt
+
+
 %% 
 
 %output_a = winsorize(output_a, [0.01, 0.99]);  
@@ -48,6 +57,13 @@ price = price(13:142);
 
 % construct y
 y = [output_a, price, interest_rate, assets, housing, borrowing];
+%% Alternative Cholesky Sequences
+
+%y = [output_a, price, interest_rate, borrowing, assets, housing]; %case 2
+%y = [output_a, price, interest_rate, assets, borrowing, housing]; %case 3
+%y = [assets, housing, borrowing, output_a, price, interest_rate]; %case 4
+%% 
+
 %y = diff(y);
 %y = diff(y);
 % display
