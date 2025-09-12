@@ -1,6 +1,10 @@
 %%
-b_min = min(W1_liq_matrix(:,15));       
-b_max = max(W1_liq_matrix(:,15));       
+b_min = min(W1_liq_matrix(:,9));       
+b_max = max(W1_liq_matrix(:,9)); 
+c_min = min(c_min);
+c_max = max(c_max);
+d_min = min(d_min);
+d_max = max(d_max);
 n_cheb = 3;      
 lambda = 1e-5;    
 
@@ -16,7 +20,7 @@ Phi_b = build_basis_matrix(nodes, orders.b, [b_min, b_max]);
 
 %% 
 total_params = (orders.c + 1) + (orders.d + 1) + (orders.b + 1); % 4+4+4=12
-Theta_guess = 0.01 * randn(total_params, 1); 
+Theta_guess = 0.0001 *rand(total_params, 1); 
 
 %% 
 options = optimoptions('fminunc', 'Algorithm', 'quasi-newton', 'Display', 'iter');
