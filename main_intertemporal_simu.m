@@ -1,4 +1,11 @@
-% HJB 
+% HJB intertemporal problem replication for Chinese Household debt
+% In this algorithm, we apply almost the same calibration to stay
+% consistency (e.g. the idiosyncratic asset returns), with slight 
+% difference (e.g. dynamically updated employment conditions by
+% Kolmogoriv equation).
+% The results yielded contain the simulated financial asset, non-
+% financial asset distribution, serving the initial values of the 
+% DSGE model calibration and the Gini calculation preparation
 
 % param(Block 1)
 params = struct();
@@ -337,7 +344,7 @@ C2_next = C2_cheby.* (C2_growth_factor/(1 + rho * delta_t)).^(1/gamma1) ;
         D2 = odebtfunc(w2_liq_next, w2_ill_next, C2_next);
         D2 = max(0, min(D2, params.D_max * 2)) ;
         
-        employment_status1 = update_employment_status1(current_status1, P_unemployment1);  % 简化假设，90%就业率
+        employment_status1 = update_employment_status1(current_status1, P_unemployment1);  
         y1_next = employment_status1 .* (params.alpha + params.beta * y1 * 1.02) + ~employment_status1 * 0.01;
         
         employment_status2 = update_employment_status1(current_status2, P_unemployment2);
