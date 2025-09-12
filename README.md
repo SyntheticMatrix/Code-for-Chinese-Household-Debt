@@ -8,6 +8,10 @@ Run the data-sorting file 'main_data.m' to execute all the data grids
 
 Run the simulation code to conduct 'main_intertemporal_simu.m', which should also call the KS test for the convergence
 
+**STEP2.1**
+This code has been updated with the idiosyncratic asset returns. Since the stochastic states are subject to random seeds, results can suffer from slight quantitative difference.
+To get the exactly same simulation of the figures, please run 'fixedseeds.mat'.
+
 **STEP3**
 
 Run the Gini calculator 'main_gini.m' to produce our Gini analysis and the figures in the maintext
