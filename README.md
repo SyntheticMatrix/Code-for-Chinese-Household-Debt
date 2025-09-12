@@ -16,12 +16,13 @@ Run 'ide_de_er.m' to get the decomposition of indirect effect and direct effect 
 
 **STEP2**
 Run the projection of heterogeneity, with the following substeps:
+Initialize by run 'SimulatedWealth.mat' to get the fixed seeds for the same results of the paper
 
 **STEP2.1**
 Conduct the residual minimization by running 'projection_method.m'
 
 **STEP2.2**
-Conduct the Chebyshev Derivative to get the projectors by running 'chebyshev_derivative.m'
+Conduct the Chebyshev Derivative to get the projectors by running 'derivative_thetaphi.m'
 
 **STEP2.3**
 Run the model 'dsge_projection.m'
