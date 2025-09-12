@@ -6,22 +6,31 @@ All models should be run after the Inter-temporal HJB problem is solved, which s
 Here is the formal steps:
 
 **STEP1**
-Run the baseline model 'compl_ge.m', which serves as our baseline ge model (i.e. without projection of the heterogeneity information and endogeneous non-financial asset interest rate)
-
-**STEP2**
 Run the endogeneous non-financial asset interest rate extension, named 'dsge_er.m'
 
-**STEP3**
+**STEP2**
 Run the projection of heterogeneity, with the following substeps:
 
-**STEP3.1**
+**STEP2.1**
 Conduct the residual minimization by running 'projection_method.m'
 
-**STEP3.2**
+**STEP2.2**
 Conduct the Chebyshev Derivative to get the projectors by running 'chebyshev_derivative.m'
 
-**STEP3.3**
+**STEP2.3**
 Run the model 'dsge_projection.m'
 
-All above should call upon the QZ solver 'solab.m' and the impulser response creator 'ir.m' and get the impulse responses of the total effects
+**STEP3**
+Run the regime-switching forward-looking model: 'main_regime.m' and 'regimeswitching.m' to get the IRFs for the k=p=1 case.
+
+**STEP3.1**
+Run 'IRRIG.m' to get the figure replication.
+
+**STEP3.2**
+Change the monetary policy response parameters in accordance with the instruction in 'main_regime.m' to get the IRFs for the k=p=2 case.
+
+**STEP3.3**
+Simiarly, run 'IRRIG.m' again the get the figure replication.
+
+All above should call upon the QZ solver 'solab.m' and the impulse response creator 'ir.m' and get the impulse responses of the total effects
 
