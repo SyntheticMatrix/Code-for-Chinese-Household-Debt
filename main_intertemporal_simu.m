@@ -7,6 +7,7 @@
 % financial asset distribution, serving the initial values of the 
 % DSGE model calibration and the Gini calculation preparation
 
+debtmode =2;
 % param(Block 1)
 params = struct();
 params.r = 0.03 ;              % 
@@ -161,7 +162,7 @@ move21 = (type==2) & (u < (1-P22));  %  u < P21 = eps
 type(move12) = 2;
 type(move21) = 1;
 
-
+% Discrete time 
 % liq_mult(i) = liq_factor(type(i))
 liq_mult = liq_factor(type)' ;          % N×1
 ill0_7_mult = ill0_7_factor(type)' ;    % N×1
@@ -336,12 +337,17 @@ C2_cheby = evaluate_chebyshev_1(C2_interp_coeff, C2);
 C1_next =  C1_cheby .* (C1_growth_factor / (1 + rho * delta_t)) .^ (1/gamma1) ; 
 C2_next = C2_cheby.* (C2_growth_factor/(1 + rho * delta_t)).^(1/gamma1) ;
 
+if debtmode== 1
+D = sdebtfunc(D, C1_next, w1_liq_next);
+D2 = sdebtfunc(D2, C2_next, w2_liq_next);
+elseif debtmode ==2
 
-% D = 0.0425 *D + 0.5*(C1_next - w1_liq_next);
         D = odebtfunc(w1_liq_next, w1_ill_next, C1_next);
-     %D = max(0, min(D, params.D_max));
-       % D2 = 0.0425*D2 + 0.5* (C2_next - w2_liq_next);
         D2 = odebtfunc(w2_liq_next, w2_ill_next, C2_next);
+        
+else
+    error('must be 1 or 2');
+end
         D2 = max(0, min(D2, params.D_max * 2)) ;
         
         employment_status1 = update_employment_status1(current_status1, P_unemployment1);  
