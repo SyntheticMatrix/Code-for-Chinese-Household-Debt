@@ -116,7 +116,7 @@ for t = 1:params.t_max
         mpc_dynamic = (C1 ./(w1_liq + w1_liq));  % mpc
         mpc_dynamic = max(0.3, mpc_dynamic);
         
-        % type 2
+        % type 2 solved jointly
         
         mpc_dynamic2 = (C2./(w2_liq + w2_ill));
         mpc_dynamic2 = max(0.3, mpc_dynamic2);
@@ -127,14 +127,14 @@ for t = 1:params.t_max
 
         
 N = 400;
-eps = 0.01;            % transition
+eps = 0.01;            % transition assumes households do not often switch between different bundles
 P11 = 1-eps; P12 = eps;
 P22 = 1-eps; P21 = eps;
 
-liq_factor = [1.0035, 1.012];      % state 1 -> low, state2 -> high
-ill0_7_factor = [1.02, 1.033];     % 
+liq_factor = [1.0035, 1.015];      % state 1 -> low, state2 -> high
+ill0_7_factor = [1.029, 1.033];     % 
 
-% matching
+% fix the initial seeds
 if ~exist('type','var') || isempty(type)
     p_init = 0.6; 
     type = double(rand(N,1) < p_init) + 1; 
