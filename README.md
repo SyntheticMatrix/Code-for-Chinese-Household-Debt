@@ -5,8 +5,13 @@
 Run the data-sorting file 'main_data.m' to execute all the data grids
 
 **STEP2**
+Switch debtmode = 1 at the top line and record the standard debt function.
 
 Run the simulation code to conduct 'main_intertemporal_simu.m', which should also call the KS test for the convergence
+
+Run 'saveold.m' to save the wealth data based on standard debt function.
+
+Switch debtmode = 2, and run 'main_intertemporal_simu.m' again.
 
 **STEP2.1**
 This code has been updated with the idiosyncratic asset returns. Since the stochastic states are subject to random seeds, results can suffer from slight quantitative difference.
