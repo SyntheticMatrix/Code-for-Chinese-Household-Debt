@@ -3,7 +3,7 @@
 % param(Block 1)
 params = struct();
 params.r = 0.03 ;              % 
-params.r_ill = 0.04;          % 
+params.r_ill = 0.02;          % 
 params.depreciation_rate = 0.02;  % 
 params.alpha = 0.3;             % 
 params.beta = 0.02 ;           % 
@@ -53,16 +53,16 @@ T2 = zeros(400,1);
 
 w1_ill = w1_ill_real;
 
-y1 = 0.75 * ones(params.num_individuals, 1);      
+y1 = 0.9 * ones(params.num_individuals, 1);      
 w2_liq = w2_liq_real;
 w2_ill = w2_ill_real;  
-y2 = 1 * ones(params.num_individuals, 1);     
+y2 = 1.2 * ones(params.num_individuals, 1);     
 V1 = 1 * ones(params.num_individuals, 1);  
 V2 = 1 * ones(params.num_individuals, 1);  
 
-grid_points_liq = linspace(min(w1_liq)-1 , max(w1_liq) +5 , n_points);  
+grid_points_liq = linspace(min(w1_liq)-1 , max(w1_liq) +5 , n_points);  % 创建网格点
 grid_points_ill = linspace(min(w1_ill) -1, max(w1_ill) +5 , n_points);
-grid_points_liq2 = linspace(min(w2_liq)-1 , max(w2_liq) +5 , n_points);  
+grid_points_liq2 = linspace(min(w2_liq)-1 , max(w2_liq) +5 , n_points);  % 创建网格点
 grid_points_ill2 = linspace(min(w2_ill) -1, max(w2_ill) +5 , n_points);
 
 disp(['grid_points_liq: ', num2str(grid_points_liq)]);
@@ -126,13 +126,46 @@ for t = 1:params.t_max
           ill_change_limit = 0.1 * w1_ill;  
 
         
-w1_liq_next = w1_liq * 1.01 - C1 + y1 - D;
+N = 400;
+eps = 0.01;            % transition
+P11 = 1-eps; P12 = eps;
+P22 = 1-eps; P21 = eps;
 
-w2_liq_next = w2_liq * 1.01 - C2 + y2 - D2;
+liq_factor = [1.0035, 1.012];      % state 1 -> low, state2 -> high
+ill0_7_factor = [1.02, 1.033];     % 
 
-w1_ill_next= (1 + params.r_ill)* w1_ill;
-w2_ill_next = (1 + params.r_ill) * w2_ill;
+% matching
+if ~exist('type','var') || isempty(type)
+    p_init = 0.6; 
+    type = double(rand(N,1) < p_init) + 1; 
+  
+    type = ones(N,1);
+    type(rand(N,1) < p_init) = 2;  
+end
 
+type = repmat([1;2], N/2, 1); 
+
+% max
+u = rand(N,1);
+% 1
+move12 = (type==1) & (u < (1-P11));  %  u < P12 = eps
+% 2：
+move21 = (type==2) & (u < (1-P22));  %  u < P21 = eps
+type(move12) = 2;
+type(move21) = 1;
+
+
+% liq_mult(i) = liq_factor(type(i))
+liq_mult = liq_factor(type)' ;          % N×1
+ill0_7_mult = ill0_7_factor(type)' ;    % N×1
+
+% w1_liq_next = w1_liq .* liq_mult - C1 + y1 - D;
+w1_liq_next = w1_liq .* liq_mult - C1 + y1 - D;
+w2_liq_next = w2_liq .* liq_mult - C2 + y2 - D2;
+
+% w1_ill_next= (1 + params.r_ill) .* w1_ill *0.3 + 0.7 .* w1_ill .* ill0_7_mult;
+w1_ill_next = (1 + params.r_ill) .* (0.3 .* w1_ill) + 0.7 .* w1_ill .* ill0_7_mult;
+w2_ill_next = (1 + params.r_ill) .* (0.3 .* w2_ill) + 0.7 .* w2_ill .* ill0_7_mult;
 threshold = 0.01;  
 transfer_amount = 0.01;  
 
@@ -209,7 +242,7 @@ end
 
 % 
 p = 0.05; 
-q = 0.2;  
+q = 0.08;  
 mu = 0.072;  five_indices = find(w2_liq_next <1); w1_liq_next(w1_liq_next < 0) = 0; w1_ill_next(w1_ill_next < 0.1) = 0.1;
 
 
@@ -297,14 +330,14 @@ C1_next =  C1_cheby .* (C1_growth_factor / (1 + rho * delta_t)) .^ (1/gamma1) ;
 C2_next = C2_cheby.* (C2_growth_factor/(1 + rho * delta_t)).^(1/gamma1) ;
 
 
- %D = 0.0425 *D + 0.5*(C1_next - w1_liq_next);
+% D = 0.0425 *D + 0.5*(C1_next - w1_liq_next);
         D = odebtfunc(w1_liq_next, w1_ill_next, C1_next);
      %D = max(0, min(D, params.D_max));
-      %  D2 = 0.0425*D2 + 0.5* (C2_next - w2_liq_next);
+       % D2 = 0.0425*D2 + 0.5* (C2_next - w2_liq_next);
         D2 = odebtfunc(w2_liq_next, w2_ill_next, C2_next);
         D2 = max(0, min(D2, params.D_max * 2)) ;
         
-        employment_status1 = update_employment_status1(current_status1, P_unemployment1);  
+        employment_status1 = update_employment_status1(current_status1, P_unemployment1);  % 简化假设，90%就业率
         y1_next = employment_status1 .* (params.alpha + params.beta * y1 * 1.02) + ~employment_status1 * 0.01;
         
         employment_status2 = update_employment_status1(current_status2, P_unemployment2);
@@ -322,7 +355,7 @@ C2_next = C2_cheby.* (C2_growth_factor/(1 + rho * delta_t)).^(1/gamma1) ;
         V_ill2 = real(V_ill2);
        
         
-       V1_interp =  interpolate_V1(V1_grid, grid_points_liq, grid_points_ill, V_liq, V_ill, w1_liq, w1_ill);  
+       V1_interp =  interpolate_V1(V1_grid, grid_points_liq, grid_points_ill, V_liq, V_ill, w1_liq, w1_ill);  % 插值计算V1
        V2_interp = interpolate_V1(V2_grid, grid_points_liq2, grid_points_ill2, V_liq2, V_ill2, w2_liq, w2_ill);
      for iter = 1:params.max_iter
         fprintf('Time step: %d, Iteration: %d\n', t, iter); 
@@ -397,16 +430,15 @@ C2_next = C2_cheby.* (C2_growth_factor/(1 + rho * delta_t)).^(1/gamma1) ;
     C2_matrix(:, current_index) = C2_next;
     mpc_matrix2(:, current_index) = mpc_dynamic2;
     D2_matrix(: , current_index) = D2;
-    W1_liq_matrix_old = W1_liq_matrix;
-    W1_ill_matrix_old = W1_ill_matrix;
-    W2_liq_matrix_old = W2_liq_matrix;
-    W2_ill_matrix_old = W2_ill_matrix;
-    
+   % W1_liq_matrix_old = W1_liq_matrix;
+    %W1_ill_matrix_old = W1_ill_matrix;
+    %W2_liq_matrix_old = W2_liq_matrix;
+    %W2_ill_matrix_old = W2_ill_matrix;
     d_bar = max(w1_liq_next + w1_ill_next)/50;
     d_min = min(w1_liq_next + w1_ill_next)/50;
-    grid_points_liq = linspace(min(w1_liq) - 1 , max(w1_liq)+1, n_points);  
+    grid_points_liq = linspace(min(w1_liq) - 1 , max(w1_liq)+1, n_points);  % 创建网格点
     grid_points_ill = linspace(min(w1_ill)- 1, max(w1_ill)+1 , n_points);
-    grid_points_liq2 = linspace(min(w2_liq)-1 , max(w2_liq) +1 , n_points);  
+    grid_points_liq2 = linspace(min(w2_liq)-1 , max(w2_liq) +1 , n_points);  % 创建网格点
 grid_points_ill2 = linspace(min(w2_ill) -1, max(w2_ill) +1 , n_points);
    min_value = min(w1_ill);
 max_value = max(w1_ill);
