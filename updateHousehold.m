@@ -52,8 +52,8 @@ c_B(1,:,:) = 0;
     
     d_idt = 0.0687*aaa; %REALW2
     d_idt = 0.0731*aaa;  %REALW1
-   % d_idt3 = 0.76*aaa;
-    %d_idt2 = 0.16*aaa;
+    d_idt3 = 0.76*aaa;
+    d_idt2 = 0.16*aaa;
     
     
    % Impose the maximum to reflect lumpy non-financial assets
@@ -134,6 +134,7 @@ c_B(1,:,:) = 0;
     dbt_F = c_F - sb_F; dbt_B = c_B - sb_B; dbt_0 = c_0 - c_0;
    
     dbt = dbt_F.*I_F + dbt_B.*I_B; +dbt_0.*I_0;
+    dbt = 0.2*dbt;
     % 6. ================= Transition Matrix =================
     %
     A = driftMatrixLiquid(sb, bbb, par) + ...
