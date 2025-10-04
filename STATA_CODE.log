@@ -1,130 +1,181 @@
-. drop if total_asset<=0
-(0 observations deleted)
+gen bottom80_income = (quintile_i <= 4)
 
-. drop if total_income<=0
-(752 observations deleted)
+. perserve
+command perserve is unrecognized
+r(199);
 
-. sum total_debt
+. preserve
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-  total_debt |     26,512    72887.26    316849.1          0   1.40e+07
+. collapse (p10) DIR10=DIR (p90) DIR90=DIR, by(bottom80_income)
 
-. gen DAR = total_debt/ total_asset
+. 
+. list
+
+     +------------------------------+
+     | bottom~e   DIR10       DIR90 |
+     |------------------------------|
+  1. |        0       0   2.4257945 |
+  2. |        1       0   3.4995217 |
+     +------------------------------+
+
+. restore
+
+. preserve
+
+. drop if total_debt ==0
+(16,064 observations deleted)
+
+. xtile quintile_i_indebted = total_income, nq(5)
+
+. collapse (sum) total_debt total_income, by(quintile_i)
 
 . gen DIR = total_debt/total_income
 
+. list in 1/5, clean noobs
 
-. sum DIR if poorest20_income
+    quinti~i   total_~t   total_~e         DIR  
+           1   1.31e+08   1.20e+07   10.894438  
+           2   1.62e+08   4.79e+07   3.3862816  
+           3   2.30e+08   9.96e+07   2.3108673  
+           4   3.33e+08   1.77e+08    1.875306  
+           5   1.08e+09   7.74e+08   1.3910797  
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DIR |      4,702    423.4863    14698.95          0   898751.7
+. restore
 
-. sum DAR if poorest20_asset
+. preserve
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DAR |      5,269    3.401043    139.2307          0      10000
+. drop if total_debt ==0
+(16,064 observations deleted)
 
+. xtile quintile_i_indebted = total_income, nq(5)
 
+. collapse (p10) DIR10=DIR (p90) DIR90=DIR, by(quintile_i_indebted
+> )
 
-. sum DAR if poorest20_income
+. list
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DAR |      4,702    1.101634    20.87965          0   857.6642
-
- sum DAR if richest80_income
-
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DAR |     21,810    .6710387    67.75497          0      10000
-
-. sum DAR if richest80_asset
-
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DAR |     21,243    .0892125    .3152326          0   21.57791
-
-. sum DIR if richest80_asset
-
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DIR |     21,243    92.79226    6915.259          0   898751.7
-
-. sum DIR if richest80_income
-
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DIR |     21,810    .9269476    4.118652          0   275.1032
-
-. sum DIR if poorest20_asset
-
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DIR |      5,269    7.641505    321.5001          0      22934
-
-. xtile pctile_asset8 = total_asset, nq(1000)
+     +----------------------------------+
+     | quinti~d       DIR10       DIR90 |
+     |----------------------------------|
+  1. |        1   .21570319   54.357412 |
+  2. |        2    .0999825    7.360286 |
+  3. |        3   .09491525   5.0475595 |
+  4. |        4   .06606627   3.9039451 |
+  5. |        5   .06004563   3.5618494 |
+     +----------------------------------+
 
 
-. gen poorest08_asset = (pctile_asset8>1 & pctile_asset8<201)
+. restore
 
-. sum DAR if poorest08_asset
+. preserve
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DAR |      5,276    1.077571    13.51754          0   857.6642
+. drop if total_debt ==0
+(16,064 observations deleted)
+
+. xtile quintile_i_indebted = total_income, nq(5)
+
+. gen bottom80_income = (quintile_i_indebted <= 4)
+variable bottom80_income already defined
+r(110);
+
+. gen bottom80_income_indebted = (quintile_i_indebted <= 4)
+
+. collapse (p10) DIR10=DIR (p90) DIR90=DIR, by(bottom80_income_ind
+> ebted)
+
+. list
+
+     +----------------------------------+
+     | bottom~d       DIR10       DIR90 |
+     |----------------------------------|
+  1. |        0   .06004563   3.5618494 |
+  2. |        1   .10026222   10.791977 |
+     +----------------------------------+
+
+. restore
+
+. preserve
 
 
-. sum DIR if poorest08_asset
+ sum DIR
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DIR |      5,276    7.632578    321.2869          0      22934
+    Variable |        Obs        Mean    Std. Dev.       Min      
+>   Max
+-------------+----------------------------------------------------
+> -----
+         DIR |     26,512    75.86938    6191.787          0   898
+> 751.7
 
-. xtile pctile_income8 = total_income, nq(1000)
+. preserve
 
-. gen poorest08_income = (pctile_income8>1 & pctile_income8<201)
+. collapse (p10) DIR10=DIR (p90) DIR90=DIR, by(quintile_i)
 
-. sum DAR if poorest08_income
+. list quintile_i DAR10 DAR90 DIR10 DIR90, noobs
+variable DAR10 not found
+r(111);
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DAR |      5,276    1.027617    19.80512          0   857.6642
+. list quintile_i DIR10 DIR90, noobs
 
-. sum DIR if poorest08_income
+  +------------------------------+
+  | quinti~i   DIR10       DIR90 |
+  |------------------------------|
+  |        1       0   13.368984 |
+  |        2       0    3.082519 |
+  |        3       0   2.2647321 |
+  |        4       0   2.0177507 |
+  |        5       0   2.4257945 |
+  +------------------------------+
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DIR |      5,276    51.12968    1149.819          0   67567.57
+. restore
 
-. gen richest08_income = (pctile_income8>=201 & pctile_income8<1000)
+. gen bottom80_asset = (quintile <= 4)
 
-. sum DAR if richest08_income
+. collapse (p10) DAR10=DAR (p90) DAR90=DAR, by(bottom80_asset)
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DAR |     21,183    .6790107    68.74377          0      10000
+. 
+. list
 
-. sum DIR if richest08_income
+     +------------------------------+
+     | bottom~t   DAR10       DAR90 |
+     |------------------------------|
+  1. |        0       0   .22010356 |
+  2. |        1       0   .37490577 |
+     +------------------------------+
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DIR |     21,183    .9160201     4.11867          0   275.1032
+. restore
 
-. gen richest08_asset = (pctile_asset8>=201 & pctile_income8<1000)
+. preserve
 
-. sum DAR if richest08_asset
+. drop if total_debt == 0
+(16,064 observations deleted)
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DAR |     21,183    .0888959    .3140079          0   21.57791
+. collapse (sum) total_debt total_asset, by(quintile)
 
-. sum DIR if richest08_asset
+. gen DAR_indebted = total_debt/total_asset
 
-    Variable |        Obs        Mean    Std. Dev.       Min        Max
--------------+---------------------------------------------------------
-         DIR |     21,183    93.05227    6925.044          0   898751.7
+. list in 1/5, clean noobs
 
-. exit, clear
+    quintile   total~bt   total~et   DAR_ind~d  
+           1   7.39e+07   7.29e+07   1.0140509  
+           2   1.12e+08   3.39e+08   .33156926  
+           3   1.77e+08   7.86e+08    .2247932  
+           4   3.59e+08   2.01e+09    .1784697  
+           5   1.21e+09   9.58e+09   .12634918  
+
+. restore
+
+. preserve
+
+ collapse (sum) total_debt total_asset, by(quintile)
+
+. gen DAR = total_debt/total_asset
+
+. list in 1/5, clean noobs
+
+    quintile   total~bt   total~et         DAR  
+           1   7.39e+07   2.23e+08   .33121151  
+           2   1.12e+08   9.13e+08   .12318025  
+           3   1.77e+08   2.11e+09   .08379113  
+           4   3.59e+08   4.63e+09   .07748027  
+           5   1.21e+09   2.19e+10   .05519945  
+
