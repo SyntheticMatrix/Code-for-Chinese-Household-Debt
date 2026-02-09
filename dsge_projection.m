@@ -21,7 +21,7 @@ B(row, 1) = 0 +rb_ss + dc_db +dd_db;
 B(row, 3) = -q;
 B(row, 2) =0;
 B(row, 6) = 0;   % y(t)
-B(row, 5) = 0;   % d(t)
+B(row, 4) = 0;   % d(t)
 B(row, 8) = b_ss;% rb(t)
 
 %% \dot{a} = ra*a +u*k
@@ -39,14 +39,14 @@ B(row, 9) = a_ss;
 row = 3;
 delta = 0.9;
 A(row, 3) = 1;       % k(t+1)
-B(row, 3) = (0 - delta); % k(t)
+B(row, 3) = (1 - delta); % k(t)
 B(row, 2) = omega;
 
 %% \dot{d} = y - omega*a - b
 row = 4;
 A(row, 4) = 1;       % d(t+1)
 B(row, 4) = 0.0425;       % d(t)
-B(row, 1) = -1;      % -b(t)
+B(row, 1) = -0.09;      % -b(t)
 B(row, 6) = 1; % c(t)
 B(row, 2) = -omega;
 
@@ -129,3 +129,4 @@ IRPJ_H=ir(f,p,x2_2,100);
 f_indirect = f;
 f_indirect(:,5) = 0;
 IRPJ_HIE=ir(f_indirect,p,x2_2,100);
+
