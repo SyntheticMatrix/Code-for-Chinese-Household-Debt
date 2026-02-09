@@ -18,7 +18,7 @@ A(row, 1) = 1;
 B(row, 1) = (1 + rb_ss); 
 B(row, 2) = omega;
 B(row, 6) = -1;   
-B(row, 5) = -1;   
+B(row, 4) = -1;   
 B(row, 8) = b_ss;
 
 %% \dot{a} = ra*a +u*k
@@ -40,7 +40,7 @@ B(row, 2) = omega;
 row = 4;
 A(row, 4) = 1;       
 B(row, 4) = 0.0425;       
-B(row, 1) = -1;      
+B(row, 1) = -0.09;      
 B(row, 6) = 1; 
 B(row, 2) = -omega;
 
@@ -125,3 +125,4 @@ IR=ir(f,p,x2_2,100);
 f_indirect = f;
 f_indirect(:,5) = 0;
 IR=ir(f_indirect,p,x2_2,100);
+
