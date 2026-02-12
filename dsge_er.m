@@ -69,7 +69,7 @@ B(row, 2) = -omega;
 beta = 0.98;
 kappa = 0.0823;
 row = 7;
-B(row, 7) = 1;   % pi(t)
+B(row, 7) = -1;   % pi(t)
 A(row, 7) = beta; % -beta*E_t[pi(t+1)]
 B(row, 6) = kappa+0.008; % -kappa*m(t)
 
@@ -124,4 +124,5 @@ IRER_H=ir(f,p,x2_2,100);
 f_indirect = f;
 f_indirect(:,5) = 0;
 IRER_HIE=ir(f_indirect,p,x2_2,100);
+
 
