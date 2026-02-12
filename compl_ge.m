@@ -65,7 +65,7 @@ B(row, 2) = -omega;
 beta = 0.98;
 kappa = 0.0823;
 row = 7;
-B(row, 7) = 1;  
+B(row, 7) = -1;  
 A(row, 7) = beta; 
 B(row, 6) = kappa; 
 
@@ -125,4 +125,5 @@ IR=ir(f,p,x2_2,100);
 f_indirect = f;
 f_indirect(:,5) = 0;
 IR=ir(f_indirect,p,x2_2,100);
+
 
